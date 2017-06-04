@@ -1,0 +1,6 @@
+env
+*.pyc
+.ipynb_checkpoints/
+.idea/
+*.p
+*.csv
