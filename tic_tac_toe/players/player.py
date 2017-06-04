@@ -1,6 +1,7 @@
 from __future__ import print_function, division
 from abc import ABCMeta, abstractmethod
 import numpy as np
+import pdb
 
 class Player(object):
     """Player interface."""
@@ -107,13 +108,6 @@ class HumanPlayer(Player):
         return action
 
 
-# TODO: debug/optimize from here
-
-def updateQ(Q, S, A, S_1, a, gamma, alpha, R, default_val):
-    maxQ = np.max([Q.get((S_1,_a),default_val) for _a in a])
-    Q[(S,A)] += alpha*(R+gamma*maxQ-Q[(S,A)])
-    return Q
-
 class QPlayer(Player):
 
     def __str__(self):
@@ -133,50 +127,56 @@ class QPlayer(Player):
         self.epsilon = epsilon
         self.Qmap = {}
         self.Qinit = 0.8
+        self.game_played = 0
 
-    def getQ(self, state, action):
+    def _getQ(self, state, action):
         if (state, action) not in self.Qmap:
             self.Qmap[(state, action)] = self.Qinit
         return self.Qmap[(state, action)]
 
+    def _explore_and_exploit(self, state, possible_actions):
+        # Explore
+        if np.random.rand() < self.epsilon/(self.game_played+1):
+            return np.random.choice(possible_actions)
+
+        # Exploit
+        Q_list = [self._getQ(state, a) for a in possible_actions]
+
+        return possible_actions[np.argmax(Q_list)]
+
+    def _updateQ(self, prev_state, prev_action, curr_state, possible_actions, reward):
+        # pdb.set_trace()
+        maxQ = np.max([self._getQ(curr_state, _action) for _action in possible_actions])
+
+        self._getQ(prev_state, prev_action)
+        self.Qmap[(prev_state, prev_action)] += self.alpha * (reward + self.gamma * maxQ - self.Qmap[(prev_state, prev_action)])
+
     def select_action(self, state, possible_actions):
         if self.prev_state is not None:
-            self.Qmap = updateQ(Q=self.Qmap,
-                                S=self.prev_state,
-                                A=self.prev_action,
-                                S_1=state,
-                                a=possible_actions,
-                                gamma=self.gamma,
-                                alpha=self.alpha,
-                                R=self.reward,
-                                default_val=self.Qinit)
-        # Explore
-        if np.random.rand() < self.epsilon:
-            return np.random.choice(possible_actions)
-        # Exploit
-        Q_list = [self.getQ(state, a) for a in possible_actions]
+            self._updateQ(prev_state=self.prev_state,
+                          prev_action=self.prev_action,
+                          curr_state=state,
+                          possible_actions=possible_actions,
+                          reward=self.reward)
 
-        action_idx = np.argmax(Q_list)
-        action = possible_actions[action_idx]
+        action = self._explore_and_exploit(state, possible_actions)
+
         self.prev_state = state
         self.prev_action = action
         return action
 
     def update(self, reward):
-        self.reward += reward
+        self.reward = reward
 
     def close(self, game_reward, terminal_state):
+        # pdb.set_trace()
+        self.game_played += 1
         self.Qmap[(terminal_state, None)] = 0
-        self.Qmap = updateQ(Q=self.Qmap,
-                            S=self.prev_state,
-                            A=self.prev_action,
-                            S_1=terminal_state,
-                            a=[None],
-                            gamma=self.gamma,
-                            alpha=self.alpha,
-                            R=game_reward,
-                            default_val=self.Qinit)
-
+        self._updateQ(prev_state=self.prev_state,
+                      prev_action=self.prev_action,
+                      curr_state=terminal_state,
+                      possible_actions=[None],
+                      reward=game_reward)
 
 
 

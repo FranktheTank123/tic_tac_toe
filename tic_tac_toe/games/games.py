@@ -90,7 +90,7 @@ class TwoPlayerGame(object):
         else:
             self.active_player.close(self.tie_reward, self.state_id)
             self.inactive_player.close(self.tie_reward, self.state_id)
-
+            self.winner = None
 
 class ClassicTicTacToe(TwoPlayerGame):
     """Classic Tic-Tac-Toe."""
@@ -133,9 +133,14 @@ class ClassicTicTacToe(TwoPlayerGame):
                 return True
         return False
 
-    def visualize_game_history(self):
-        for board in self.game_history:
+    def visualize_game_history(self, last=5):
+        if len(self.game_history) > last:
+            game_history = self.game_history[-5:]
+        else:
+            game_history = self.game_history
+
+        for board in game_history:
             print("\n")
-            print("".join(board[0:3]))
-            print("".join(board[3:6]))
-            print("".join(board[6:9]))
+            print("\t".join(board[0:3]))
+            print("\t".join(board[3:6]))
+            print("\t".join(board[6:9]))

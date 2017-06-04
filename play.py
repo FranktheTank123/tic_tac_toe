@@ -3,7 +3,7 @@ from tic_tac_toe.games.games import ClassicTicTacToe
 from tic_tac_toe.players.player import HumanPlayer, QPlayer, RandomPlayer
 import sys
 from tqdm import tqdm
-
+import pdb
 
 def play_one_game_and_summarize(g, p1, p2):
     g.play_one_game()
@@ -36,8 +36,8 @@ if __name__ == '__main__':
         num_games = 100
 
     config={
-        'p1': QPlayer(),
-        'p2': HumanPlayer(),
+        'p1': QPlayer("Q"),
+        'p2': HumanPlayer("H"),
         'num_games': num_games
     }
 
