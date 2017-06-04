@@ -113,7 +113,7 @@ class QPlayer(Player):
     def __str__(self):
         return "Q Player"
 
-    def __init__(self, _id=None, gamma=0.9, alpha=0.3, epsilon=0.1):
+    def __init__(self, _id=None, Qmap={}, game_played=0, gamma=0.9, alpha=0.3, epsilon=0.1):
         super(self.__class__, self).__init__(_id)
         self.prev_state = None
         self.prev_action = None
@@ -125,9 +125,9 @@ class QPlayer(Player):
         self.gamma = gamma
         self.alpha = alpha
         self.epsilon = epsilon
-        self.Qmap = {}
+        self.Qmap = Qmap
         self.Qinit = 0.8
-        self.game_played = 0
+        self.game_played = game_played
 
     def _getQ(self, state, action):
         if (state, action) not in self.Qmap:
@@ -145,7 +145,6 @@ class QPlayer(Player):
         return possible_actions[np.argmax(Q_list)]
 
     def _updateQ(self, prev_state, prev_action, curr_state, possible_actions, reward):
-        # pdb.set_trace()
         maxQ = np.max([self._getQ(curr_state, _action) for _action in possible_actions])
 
         self._getQ(prev_state, prev_action)
@@ -169,7 +168,6 @@ class QPlayer(Player):
         self.reward = reward
 
     def close(self, game_reward, terminal_state):
-        # pdb.set_trace()
         self.game_played += 1
         self.Qmap[(terminal_state, None)] = 0
         self._updateQ(prev_state=self.prev_state,
