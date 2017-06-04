@@ -10,6 +10,11 @@ class TwoPlayerGame(object):
     def __init__(self, player1, player2):
         self.player1 = player1
         self.player2 = player2
+        if self.player1.id is None:
+            self.player1.id = "X"
+        if self.player2.id is None:
+            self.player2.id = "O"
+
         self.active_player = None
 
         self.winner_reward = 1
@@ -81,7 +86,6 @@ class TwoPlayerGame(object):
             self.active_player.close(self.winner_reward, self.state_id)
             self.inactive_player.close(self.loser_reward, self.state_id)
             self.winner = self.active_player.id
-            print (self.active_player.id)
 
         else:
             self.active_player.close(self.tie_reward, self.state_id)

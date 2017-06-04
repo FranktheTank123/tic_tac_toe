@@ -6,7 +6,7 @@ class Player(object):
     """Player interface."""
     __metaclass__ = ABCMeta
 
-    def __init__(self,_id):
+    def __init__(self,_id=None):
         self.id = _id
         self.total_wins = 0
         self.total_loses = 0
@@ -37,7 +37,7 @@ class HumanPlayer(Player):
     def __str__(self):
         return "Human Player"
 
-    def __init__(self, _id):
+    def __init__(self, _id=None):
         super(self.__class__, self).__init__(_id)
         self.made_actions = []
         self.opponent_actions = []
@@ -119,7 +119,7 @@ class QPlayer(Player):
     def __str__(self):
         return "Q Player"
 
-    def __init__(self, _id, gamma=0.9, alpha=0.3, epsilon=0.1):
+    def __init__(self, _id=None, gamma=0.9, alpha=0.3, epsilon=0.1):
         super(self.__class__, self).__init__(_id)
         self.prev_state = None
         self.prev_action = None
@@ -127,7 +127,7 @@ class QPlayer(Player):
 
         self.state = None
         self.action = None
-        self.reward = None
+        self.reward = 0
         self.gamma = gamma
         self.alpha = alpha
         self.epsilon = epsilon
